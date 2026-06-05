@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { BrowserMultiFormatReader } from '@zxing/browser'
+import { BrowserMultiFormatReader, BarcodeFormat } from '@zxing/browser'
+import { DecodeHintType } from '@zxing/library'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
@@ -26,7 +27,25 @@ export default function Scanner({ onClose }: ScannerProps) {
   )
 
   useEffect(() => {
-    const codeReader = new BrowserMultiFormatReader()
+    // Configure hints to enable all available barcode formats
+    const hints = new Map()
+    const formats = [
+      BarcodeFormat.QR_CODE,
+      BarcodeFormat.DATA_MATRIX,
+      BarcodeFormat.EAN_13,
+      BarcodeFormat.EAN_8,
+      BarcodeFormat.CODE_128,
+      BarcodeFormat.CODE_39,
+      BarcodeFormat.CODE_93,
+      BarcodeFormat.UPC_A,
+      BarcodeFormat.UPC_E,
+      BarcodeFormat.ITF,
+      BarcodeFormat.RSS_14,
+      BarcodeFormat.RSS_EXPANDED,
+    ]
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, formats)
+    
+    const codeReader = new BrowserMultiFormatReader(hints)
     codeReaderRef.current = codeReader
     const video = videoRef.current
     

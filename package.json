@@ -4,16 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "pnpm run dev",
     "dev": "vite",
     "build": "vite build",
-    "typecheck": "tsc -b tsconfig.app.json",
+    "typecheck": "tsc -b tsconfig.app.json tsconfig.node.json && tsc -b convex/tsconfig.json",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test": "vitest --run --coverage"
   },
   "dependencies": {
     "@zxing/browser": "^0.2.0",
+    "@zxing/library": "^0.23.0",
     "convex": "^1.40.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.6",
@@ -31,6 +31,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.8",
     "autoprefixer": "^10.5.0",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",

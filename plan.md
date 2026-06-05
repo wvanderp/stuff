@@ -13,6 +13,7 @@ Single-user, no login required (security through obscurity). Items live in flat 
 ## Pages
 
 ### 1. Items List (Home `/`)
+
 - **Top bar**: button to open the barcode/QR scanner overlay
 - **Search box**: Convex full-text search across title, description, and keywords
 - **Item grid / list**: cards showing:
@@ -23,6 +24,7 @@ Single-user, no login required (security through obscurity). Items live in flat 
 - Soft-deleted (archived) items are hidden from this view
 
 ### 2. Item Details (`/items/:id`)
+
 - Hero photo carousel (all photos, swipeable); user can tap any photo to set it as the hero
 - Title & description (LLM-generated, editable)
 - Keywords displayed as chips (tap chip to remove); add new keywords via chip input
@@ -32,6 +34,7 @@ Single-user, no login required (security through obscurity). Items live in flat 
 - Actions: edit, **soft-delete** (archive), move to different box (scan target box QR or pick from list), add note, add photo, **Generate with AI** button (sends up to 5 photos to LLM)
 
 ### 3. Box Details (`/boxes/:id`)
+
 - Box photo (optional)
 - Box name & description
 - Box identifier / barcode — auto-generated UUID, displayed as scannable QR code to print/share
@@ -137,7 +140,9 @@ The scanner is a simple overlay: scan a QR/barcode → app immediately navigates
 | Secrets | GitHub Secrets + Convex environment variables |
 
 ### Component philosophy
+
 Lots of shared, reusable components:
+
 - `<Scanner />` — camera overlay, emits decoded string
 - `<ItemCard />` — used on home page and inside box details
 - `<PhotoCarousel />` — used on item & box details
