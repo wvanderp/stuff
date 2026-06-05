@@ -17,6 +17,9 @@ importers:
       convex:
         specifier: ^1.40.0
         version: 1.40.0(react@19.2.7)
+      convex-passkey-auth:
+        specifier: ^1.0.1
+        version: 1.0.1(convex@1.40.0(react@19.2.7))(react@19.2.7)
       qrcode.react:
         specifier: ^4.2.0
         version: 4.2.0(react@19.2.7)
@@ -942,6 +945,15 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
+
+  convex-passkey-auth@1.0.1:
+    resolution: {integrity: sha512-selMl5ViUkdJ6HcHA3Gefs3PrfTrwrg1K4v6cbHktKCbOmsKLhhazcKWMESiiZLLjRHTs2kbfL9WrNF7IqO/2w==}
+    peerDependencies:
+      convex: ^1.24.0
+      react: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   convex@1.40.0:
     resolution: {integrity: sha512-jChWEB45q+9Ibryc7hg0l6hB1xA4zwE2y6ZhkhGP6oJkqYeiURkMagA2ZQZYMy1/T8PZ9ztoVJJtbL/+Ob851Q==}
@@ -2526,6 +2538,12 @@ snapshots:
   chai@6.2.2: {}
 
   convert-source-map@2.0.0: {}
+
+  convex-passkey-auth@1.0.1(convex@1.40.0(react@19.2.7))(react@19.2.7):
+    dependencies:
+      convex: 1.40.0(react@19.2.7)
+    optionalDependencies:
+      react: 19.2.7
 
   convex@1.40.0(react@19.2.7):
     dependencies:

@@ -4,10 +4,13 @@ import { Link } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
 import ItemCard from '../components/ItemCard'
 import Scanner from '../components/Scanner'
+import { useAuthActions } from '../components/authActions'
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showScanner, setShowScanner] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const { logout } = useAuthActions()
   
   const items = useQuery(api.items.list)
   const searchResults = useQuery(
@@ -22,7 +25,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-bold">Stuff Manager</h1>
-        <div className="grid grid-cols-3 gap-2 sm:flex">
+        <div className="grid grid-cols-4 gap-2 sm:flex">
           <button
             onClick={() => setShowScanner(true)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded-lg flex items-center justify-center gap-2 sm:px-4 sm:py-2"
@@ -51,6 +54,44 @@ export default function HomePage() {
             </svg>
             <span>Item</span>
           </Link>
+          <div className="relative">
+            <button
+              type="button"
+              aria-expanded={showMenu}
+              aria-label="Open account menu"
+              onClick={() => setShowMenu((current) => !current)}
+              className="flex h-full w-full items-center justify-center rounded-lg bg-gray-800 px-3 py-3 text-white hover:bg-gray-700 sm:px-4 sm:py-2"
+            >
+              <svg
+                className="h-5 w-5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+            {showMenu && (
+              <div className="absolute right-0 z-20 mt-2 w-40 rounded-lg border border-gray-700 bg-gray-900 p-1 shadow-xl shadow-black/30">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setShowMenu(false)
+                    await logout()
+                  }}
+                  className="w-full rounded-md px-3 py-2 text-left text-sm font-medium text-gray-100 hover:bg-gray-800"
+                >
+                  Sign out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

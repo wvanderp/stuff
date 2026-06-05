@@ -15,6 +15,7 @@
     "@zxing/browser": "^0.2.0",
     "@zxing/library": "^0.22.0",
     "convex": "^1.40.0",
+    "convex-passkey-auth": "^1.0.1",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

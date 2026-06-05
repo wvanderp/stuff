@@ -135,7 +135,6 @@ The scanner is a simple overlay: scan a QR/barcode → app immediately navigates
 | CI/CD | GitHub Actions |
 | CI lint gate | Fail build on lint errors (warnings allowed) |
 | Unit/component tests | Vitest + Testing Library |
-| E2E tests | None for now |
 | Runtime validation | No additional runtime schema validation for now |
 | Secrets | GitHub Secrets + Convex environment variables |
 
@@ -218,7 +217,6 @@ src/
 | Formatting policy | ESLint styling rules |
 | CI lint failure threshold | Errors only |
 | Unit/component test framework | Vitest + Testing Library |
-| E2E test framework | None for now |
 | Repository structure | Single repo (frontend + Convex) |
 | Runtime validation library | None for now |
 

@@ -4,11 +4,12 @@ import ItemDetailPage from './pages/ItemDetailPage'
 import BoxDetailPage from './pages/BoxDetailPage'
 import CreateBoxPage from './pages/CreateBoxPage'
 import CreateItemPage from './pages/CreateItemPage'
+import PasskeyAuthGate from './components/PasskeyAuthGate'
 
 function App() {
   return (
     <BrowserRouter basename="/stuff">
-      <div className="min-h-screen bg-gray-950 text-gray-100">
+      <PasskeyAuthGate>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/boxes/new" element={<CreateBoxPage />} />
@@ -16,7 +17,7 @@ function App() {
           <Route path="/items/:id" element={<ItemDetailPage />} />
           <Route path="/boxes/:id" element={<BoxDetailPage />} />
         </Routes>
-      </div>
+      </PasskeyAuthGate>
     </BrowserRouter>
   )
 }

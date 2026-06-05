@@ -8,11 +8,15 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
 import type * as boxes from "../boxes.js";
+import type * as crons from "../crons.js";
 import type * as files from "../files.js";
 import type * as items from "../items.js";
 import type * as llm from "../llm.js";
 import type * as notes from "../notes.js";
+import type * as passkeyCleanup from "../passkeyCleanup.js";
+import type * as passkeys from "../passkeys.js";
 
 import type {
   ApiFromModules,
@@ -21,11 +25,15 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
   boxes: typeof boxes;
+  crons: typeof crons;
   files: typeof files;
   items: typeof items;
   llm: typeof llm;
   notes: typeof notes;
+  passkeyCleanup: typeof passkeyCleanup;
+  passkeys: typeof passkeys;
 }>;
 
 /**
@@ -54,4 +62,6 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  passkeyAuth: import("convex-passkey-auth/_generated/component.js").ComponentApi<"passkeyAuth">;
+};
