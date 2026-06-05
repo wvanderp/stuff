@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_CONVEX_URL: ${VITE_CONVEX_URL}
+    image: stuff-manager
+    ports:
+      - "80:80"

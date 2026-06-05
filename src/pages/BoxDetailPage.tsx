@@ -47,6 +47,16 @@ export default function BoxDetailPage() {
       <div className="bg-gray-900 rounded-lg p-6 mb-6">
         <h1 className="text-3xl font-bold mb-2">{box.name}</h1>
         {box.description && <p className="text-gray-400 mb-4">{box.description}</p>}
+
+        {box.photoStorageId && (
+          <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden mb-4">
+            <img
+              src={`${import.meta.env.VITE_CONVEX_URL}/storage/${box.photoStorageId}`}
+              alt={box.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
         
         {/* QR Code */}
         <div className="bg-white p-4 rounded-lg inline-block">

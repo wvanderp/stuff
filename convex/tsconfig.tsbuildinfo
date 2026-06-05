@@ -1,1 +1,1 @@
-{"root":["./global.d.ts","./boxes.ts","./items.ts","./llm.ts","./notes.ts","./schema.ts"],"version":"6.0.3"}
+{"root":["./global.d.ts","./boxes.ts","./files.ts","./items.ts","./llm.ts","./notes.ts","./schema.ts"],"version":"6.0.3"}

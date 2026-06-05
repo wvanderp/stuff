@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from 'convex/react'
+import { Link } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
 import ItemCard from '../components/ItemCard'
 import Scanner from '../components/Scanner'
@@ -19,17 +20,38 @@ export default function HomePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-bold">Stuff Manager</h1>
-        <button
-          onClick={() => setShowScanner(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-          </svg>
-          Scan
-        </button>
+        <div className="grid grid-cols-3 gap-2 sm:flex">
+          <button
+            onClick={() => setShowScanner(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded-lg flex items-center justify-center gap-2 sm:px-4 sm:py-2"
+          >
+            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+            <span>Scan</span>
+          </button>
+          <Link
+            to="/boxes/new"
+            className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-3 rounded-lg flex items-center justify-center gap-2 sm:px-4 sm:py-2"
+          >
+            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.3 7L12 12l8.7-5M12 22V12" />
+            </svg>
+            <span>Box</span>
+          </Link>
+          <Link
+            to="/items/new"
+            className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-3 rounded-lg flex items-center justify-center gap-2 sm:px-4 sm:py-2"
+          >
+            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7h-9m9 4h-9m9 4h-9M4 7h.01M4 11h.01M4 15h.01" />
+            </svg>
+            <span>Item</span>
+          </Link>
+        </div>
       </div>
 
       {/* Search */}

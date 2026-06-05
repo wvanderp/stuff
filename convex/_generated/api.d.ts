@@ -9,6 +9,7 @@
  */
 
 import type * as boxes from "../boxes.js";
+import type * as files from "../files.js";
 import type * as items from "../items.js";
 import type * as llm from "../llm.js";
 import type * as notes from "../notes.js";
@@ -21,6 +22,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   boxes: typeof boxes;
+  files: typeof files;
   items: typeof items;
   llm: typeof llm;
   notes: typeof notes;

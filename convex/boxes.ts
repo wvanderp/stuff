@@ -45,10 +45,18 @@ export const create = mutation({
     name: v.string(),
     description: v.string(),
     photoStorageId: v.union(v.string(), v.null()),
+    identifier: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Generate a UUID for the box identifier
-    const identifier = crypto.randomUUID();
+    const identifier = args.identifier?.trim() || crypto.randomUUID();
+    const existingBox = await ctx.db
+      .query("boxes")
+      .withIndex("by_identifier", (q) => q.eq("identifier", identifier))
+      .first();
+
+    if (existingBox) {
+      throw new Error(`Box with identifier ${identifier} already exists`);
+    }
     
     return await ctx.db.insert("boxes", {
       name: args.name,

@@ -119,6 +119,7 @@ src/
 ## Data Model
 
 ### Items
+
 - Title, description, keywords (LLM-generated, editable)
 - Photos with hero selection
 - Box assignment (required)
@@ -126,11 +127,13 @@ src/
 - Soft-delete with `archivedAt`
 
 ### Boxes
+
 - Name, description
 - Optional photo
 - Auto-generated UUID identifier (displayed as QR code)
 
 ### Notes
+
 - Attached to items
 - Text + photos
 - Newest-first ordering
@@ -138,12 +141,15 @@ src/
 ## Scanning Flows
 
 ### Look up an item
+
 1. Open scanner → scan item barcode → navigate to item details
 
 ### Look up a box
+
 1. Open scanner → scan box QR → navigate to box with contents
 
 ### Add a new item
+
 1. Create item → assign box (required) → add photos → optionally use "Generate with AI"
 
 ## Deployment
