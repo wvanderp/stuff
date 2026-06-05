@@ -87,6 +87,11 @@ export const create = mutation({
     identifiers: v.array(v.string()),
   },
   handler: async (ctx, args) => {
+    const title = args.title.trim();
+    if (!title && args.photoStorageIds.length === 0) {
+      throw new Error("Item requires a name or at least one photo");
+    }
+
     // Check for duplicate identifiers
     if (args.identifiers.length > 0) {
       const allItems = await ctx.db.query("items").collect();
@@ -104,7 +109,7 @@ export const create = mutation({
       : null;
     
     return await ctx.db.insert("items", {
-      title: args.title,
+      title,
       description: args.description,
       keywords: args.keywords,
       heroPhotoStorageId,
