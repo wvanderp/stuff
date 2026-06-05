@@ -154,6 +154,19 @@ src/
 
 ## Deployment
 
+### GitHub Pages
+
+GitHub Pages deployment is configured in `.github/workflows/deploy-pages.yml`.
+
+1. In GitHub, go to **Settings → Pages → Build and deployment**.
+2. Set **Source** to **GitHub Actions**.
+3. Add these repository secrets in **Settings → Secrets and variables → Actions**:
+   - `VITE_CONVEX_URL`
+   - `VITE_CONVEX_SITE_URL`
+4. Push to `main`, or run the **Deploy GitHub Pages** workflow manually.
+
+The workflow runs linting, type checking, unit tests, and the production build before publishing `dist/`. The app is hard-coded to run under `/stuff/`, so the Pages URL should be `https://<user>.github.io/stuff/`.
+
 ### Docker
 
 Build the image:

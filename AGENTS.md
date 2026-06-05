@@ -16,7 +16,7 @@ Architecture and clean code are more important than speed of development, so mak
 
 ---
 
-Testing is very important from the first lines of code there should be tests. Both vitest for unit tests and cypress for end to end tests. We want to make sure that the system is stable and reliable, so we need to have a good test coverage.
+Testing is very important from the first lines of code there should be tests. We want to make sure that the system is stable and reliable, so we need to have a good test coverage.
 
 ---
 

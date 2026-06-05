@@ -7,7 +7,7 @@ import CreateItemPage from './pages/CreateItemPage'
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/stuff">
       <div className="min-h-screen bg-gray-950 text-gray-100">
         <Routes>
           <Route path="/" element={<HomePage />} />
