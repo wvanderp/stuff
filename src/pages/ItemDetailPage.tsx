@@ -67,6 +67,7 @@ export default function ItemDetailPage() {
         <div className="mb-6">
           <PhotoCarousel 
             photoStorageIds={item.photoStorageIds} 
+            photoUrls={item.photoUrls}
             heroPhotoStorageId={item.heroPhotoStorageId}
             itemId={id as Id<'items'>}
           />

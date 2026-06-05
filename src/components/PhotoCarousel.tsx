@@ -5,32 +5,40 @@ import type { Id } from '../../convex/_generated/dataModel'
 
 interface PhotoCarouselProps {
   photoStorageIds: string[]
+  photoUrls?: Array<{
+    storageId: string
+    url: string | null
+  }>
   heroPhotoStorageId: string | null
   itemId: Id<'items'>
 }
 
 export default function PhotoCarousel({
   photoStorageIds,
+  photoUrls,
   heroPhotoStorageId,
   itemId,
 }: PhotoCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const updateItem = useMutation(api.items.update)
+  const availablePhotos = (photoUrls ?? []).filter((photo) => photo.url !== null)
 
-  if (photoStorageIds.length === 0) {
+  if (photoStorageIds.length === 0 || availablePhotos.length === 0) {
     return null
   }
+
+  const currentPhoto = availablePhotos[currentIndex] ?? availablePhotos[0]
 
   const handleSetHero = async (photoStorageId: string) => {
     await updateItem({ id: itemId, heroPhotoStorageId: photoStorageId })
   }
 
   const next = () => {
-    setCurrentIndex((prev) => (prev + 1) % photoStorageIds.length)
+    setCurrentIndex((prev) => (prev + 1) % availablePhotos.length)
   }
 
   const prev = () => {
-    setCurrentIndex((prev) => (prev - 1 + photoStorageIds.length) % photoStorageIds.length)
+    setCurrentIndex((prev) => (prev - 1 + availablePhotos.length) % availablePhotos.length)
   }
 
   return (
@@ -38,14 +46,14 @@ export default function PhotoCarousel({
       {/* Main Image */}
       <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden">
         <img
-          src={`${import.meta.env.VITE_CONVEX_URL}/storage/${photoStorageIds[currentIndex]}`}
+          src={currentPhoto.url ?? ''}
           alt=""
           className="w-full h-full object-contain"
         />
       </div>
 
       {/* Navigation Arrows */}
-      {photoStorageIds.length > 1 && (
+      {availablePhotos.length > 1 && (
         <>
           <button
             onClick={prev}
@@ -67,29 +75,29 @@ export default function PhotoCarousel({
       )}
 
       {/* Thumbnails */}
-      {photoStorageIds.length > 1 && (
+      {availablePhotos.length > 1 && (
         <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
-          {photoStorageIds.map((photoId, idx) => (
+          {availablePhotos.map((photo, idx) => (
             <button
-              key={photoId}
+              key={photo.storageId}
               onClick={() => {
                 setCurrentIndex(idx)
-                handleSetHero(photoId)
+                handleSetHero(photo.storageId)
               }}
               className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${
                 idx === currentIndex
                   ? 'border-blue-600'
-                  : photoId === heroPhotoStorageId
+                  : photo.storageId === heroPhotoStorageId
                   ? 'border-yellow-500'
                   : 'border-gray-700'
               }`}
             >
               <img
-                src={`${import.meta.env.VITE_CONVEX_URL}/storage/${photoId}`}
+                src={photo.url ?? ''}
                 alt=""
                 className="w-full h-full object-cover"
               />
-              {photoId === heroPhotoStorageId && (
+              {photo.storageId === heroPhotoStorageId && (
                 <div className="absolute top-0 right-0 bg-yellow-500 text-black text-xs px-1">
                   Hero
                 </div>

@@ -7,7 +7,7 @@ interface ItemCardProps {
   item: {
     _id: Id<'items'>
     title: string
-    heroPhotoStorageId: string | null
+    heroPhotoUrl: string | null
     boxId: Id<'boxes'>
   }
 }
@@ -21,10 +21,10 @@ export default function ItemCard({ item }: ItemCardProps) {
       className="bg-gray-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-blue-600 transition-all"
     >
       {/* Hero Photo */}
-      {item.heroPhotoStorageId && (
+      {item.heroPhotoUrl && (
         <div className="aspect-square bg-gray-800">
           <img 
-            src={`${import.meta.env.VITE_CONVEX_URL}/storage/${item.heroPhotoStorageId}`}
+            src={item.heroPhotoUrl}
             alt={item.title}
             className="w-full h-full object-cover"
           />

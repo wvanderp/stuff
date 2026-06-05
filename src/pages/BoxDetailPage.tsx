@@ -48,10 +48,10 @@ export default function BoxDetailPage() {
         <h1 className="text-3xl font-bold mb-2">{box.name}</h1>
         {box.description && <p className="text-gray-400 mb-4">{box.description}</p>}
 
-        {box.photoStorageId && (
+        {box.photoUrl && (
           <div className="aspect-video bg-gray-800 rounded-lg overflow-hidden mb-4">
             <img
-              src={`${import.meta.env.VITE_CONVEX_URL}/storage/${box.photoStorageId}`}
+              src={box.photoUrl}
               alt={box.name}
               className="w-full h-full object-cover"
             />

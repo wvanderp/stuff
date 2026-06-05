@@ -1,10 +1,43 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+import type { QueryCtx } from "./_generated/server";
+
+async function getStorageUrl(ctx: QueryCtx, storageId: string | null) {
+  if (storageId === null) {
+    return null;
+  }
+
+  return await ctx.storage.getUrl(storageId as Id<"_storage">);
+}
+
+async function withPhotoUrl(ctx: QueryCtx, box: Doc<"boxes">) {
+  return {
+    ...box,
+    photoUrl: await getStorageUrl(ctx, box.photoStorageId),
+  };
+}
+
+async function withItemPhotoUrls(ctx: QueryCtx, item: Doc<"items">) {
+  const photoUrls = await Promise.all(
+    item.photoStorageIds.map(async (storageId) => ({
+      storageId,
+      url: await getStorageUrl(ctx, storageId),
+    })),
+  );
+
+  return {
+    ...item,
+    heroPhotoUrl: await getStorageUrl(ctx, item.heroPhotoStorageId),
+    photoUrls,
+  };
+}
 
 // Query: Get all boxes
 export const list = query({
   handler: async (ctx) => {
-    return await ctx.db.query("boxes").collect();
+    const boxes = await ctx.db.query("boxes").collect();
+    return await Promise.all(boxes.map((box) => withPhotoUrl(ctx, box)));
   },
 });
 
@@ -12,7 +45,8 @@ export const list = query({
 export const get = query({
   args: { id: v.id("boxes") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
+    const box = await ctx.db.get(args.id);
+    return box === null ? null : await withPhotoUrl(ctx, box);
   },
 });
 
@@ -20,10 +54,12 @@ export const get = query({
 export const getByIdentifier = query({
   args: { identifier: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const box = await ctx.db
       .query("boxes")
       .withIndex("by_identifier", (q) => q.eq("identifier", args.identifier))
       .first();
+
+    return box === null ? null : await withPhotoUrl(ctx, box);
   },
 });
 
@@ -31,11 +67,13 @@ export const getByIdentifier = query({
 export const getItems = query({
   args: { boxId: v.id("boxes") },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const items = await ctx.db
       .query("items")
       .withIndex("by_box", (q) => q.eq("boxId", args.boxId))
       .filter((q) => q.eq(q.field("archivedAt"), null))
       .collect();
+
+    return await Promise.all(items.map((item) => withItemPhotoUrls(ctx, item)));
   },
 });
 

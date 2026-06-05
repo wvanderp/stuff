@@ -1,13 +1,40 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+import type { QueryCtx } from "./_generated/server";
+
+async function getStorageUrl(ctx: QueryCtx, storageId: string | null) {
+  if (storageId === null) {
+    return null;
+  }
+
+  return await ctx.storage.getUrl(storageId as Id<"_storage">);
+}
+
+async function withPhotoUrls(ctx: QueryCtx, item: Doc<"items">) {
+  const photoUrls = await Promise.all(
+    item.photoStorageIds.map(async (storageId) => ({
+      storageId,
+      url: await getStorageUrl(ctx, storageId),
+    })),
+  );
+
+  return {
+    ...item,
+    heroPhotoUrl: await getStorageUrl(ctx, item.heroPhotoStorageId),
+    photoUrls,
+  };
+}
 
 // Query: Get all active (non-archived) items
 export const list = query({
   handler: async (ctx) => {
-    return await ctx.db
+    const items = await ctx.db
       .query("items")
       .withIndex("by_archived", (q) => q.eq("archivedAt", null))
       .collect();
+
+    return await Promise.all(items.map((item) => withPhotoUrls(ctx, item)));
   },
 });
 
@@ -15,13 +42,15 @@ export const list = query({
 export const search = query({
   args: { query: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const items = await ctx.db
       .query("items")
       .withSearchIndex("search_items", (q) => 
         q.search("title", args.query)
       )
       .filter((q) => q.eq(q.field("archivedAt"), null))
       .collect();
+
+    return await Promise.all(items.map((item) => withPhotoUrls(ctx, item)));
   },
 });
 
@@ -29,7 +58,8 @@ export const search = query({
 export const get = query({
   args: { id: v.id("items") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
+    const item = await ctx.db.get(args.id);
+    return item === null ? null : await withPhotoUrls(ctx, item);
   },
 });
 
@@ -40,8 +70,9 @@ export const getByIdentifier = query({
     const items = await ctx.db
       .query("items")
       .collect();
-    
-    return items.find((item) => item.identifiers.includes(args.identifier));
+
+    const item = items.find((item) => item.identifiers.includes(args.identifier));
+    return item === undefined ? null : await withPhotoUrls(ctx, item);
   },
 });
 
