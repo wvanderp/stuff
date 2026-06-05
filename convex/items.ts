@@ -1,0 +1,197 @@
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
+
+// Query: Get all active (non-archived) items
+export const list = query({
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("items")
+      .withIndex("by_archived", (q) => q.eq("archivedAt", null))
+      .collect();
+  },
+});
+
+// Query: Search items by text
+export const search = query({
+  args: { query: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("items")
+      .withSearchIndex("search_items", (q) => 
+        q.search("title", args.query)
+      )
+      .filter((q) => q.eq(q.field("archivedAt"), null))
+      .collect();
+  },
+});
+
+// Query: Get a single item by ID
+export const get = query({
+  args: { id: v.id("items") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+// Query: Get an item by identifier (barcode/QR)
+export const getByIdentifier = query({
+  args: { identifier: v.string() },
+  handler: async (ctx, args) => {
+    const items = await ctx.db
+      .query("items")
+      .collect();
+    
+    return items.find((item) => item.identifiers.includes(args.identifier));
+  },
+});
+
+// Mutation: Create a new item
+export const create = mutation({
+  args: {
+    title: v.string(),
+    description: v.string(),
+    keywords: v.array(v.string()),
+    photoStorageIds: v.array(v.string()),
+    boxId: v.id("boxes"),
+    identifiers: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Check for duplicate identifiers
+    if (args.identifiers.length > 0) {
+      const allItems = await ctx.db.query("items").collect();
+      for (const item of allItems) {
+        for (const identifier of args.identifiers) {
+          if (item.identifiers.includes(identifier)) {
+            throw new Error(`Item with identifier ${identifier} already exists`);
+          }
+        }
+      }
+    }
+    
+    const heroPhotoStorageId = args.photoStorageIds.length > 0 
+      ? args.photoStorageIds[0] 
+      : null;
+    
+    return await ctx.db.insert("items", {
+      title: args.title,
+      description: args.description,
+      keywords: args.keywords,
+      heroPhotoStorageId,
+      photoStorageIds: args.photoStorageIds,
+      boxId: args.boxId,
+      identifiers: args.identifiers,
+      archivedAt: null,
+    });
+  },
+});
+
+// Mutation: Update an item
+export const update = mutation({
+  args: {
+    id: v.id("items"),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    keywords: v.optional(v.array(v.string())),
+    heroPhotoStorageId: v.optional(v.union(v.string(), v.null())),
+    photoStorageIds: v.optional(v.array(v.string())),
+    boxId: v.optional(v.id("boxes")),
+    identifiers: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+  },
+});
+
+// Mutation: Add a keyword to an item
+export const addKeyword = mutation({
+  args: {
+    id: v.id("items"),
+    keyword: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.id);
+    if (!item) throw new Error("Item not found");
+    
+    if (!item.keywords.includes(args.keyword)) {
+      await ctx.db.patch(args.id, {
+        keywords: [...item.keywords, args.keyword],
+      });
+    }
+  },
+});
+
+// Mutation: Remove a keyword from an item
+export const removeKeyword = mutation({
+  args: {
+    id: v.id("items"),
+    keyword: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.id);
+    if (!item) throw new Error("Item not found");
+    
+    await ctx.db.patch(args.id, {
+      keywords: item.keywords.filter((k) => k !== args.keyword),
+    });
+  },
+});
+
+// Mutation: Add an identifier to an item
+export const addIdentifier = mutation({
+  args: {
+    id: v.id("items"),
+    identifier: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Check for duplicates across all items
+    const allItems = await ctx.db.query("items").collect();
+    for (const item of allItems) {
+      if (item.identifiers.includes(args.identifier)) {
+        throw new Error(`Item with identifier ${args.identifier} already exists`);
+      }
+    }
+    
+    const item = await ctx.db.get(args.id);
+    if (!item) throw new Error("Item not found");
+    
+    if (!item.identifiers.includes(args.identifier)) {
+      await ctx.db.patch(args.id, {
+        identifiers: [...item.identifiers, args.identifier],
+      });
+    }
+  },
+});
+
+// Mutation: Soft delete (archive) an item
+export const archive = mutation({
+  args: { id: v.id("items") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      archivedAt: Date.now(),
+    });
+  },
+});
+
+// Mutation: Restore an archived item
+export const restore = mutation({
+  args: { id: v.id("items") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      archivedAt: null,
+    });
+  },
+});
+
+// Mutation: Move item to a different box
+export const moveToBox = mutation({
+  args: {
+    id: v.id("items"),
+    boxId: v.id("boxes"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      boxId: args.boxId,
+    });
+  },
+});
