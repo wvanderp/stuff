@@ -27,6 +27,7 @@ vi.mock('../../convex/_generated/api', () => ({
   api: {
     boxes: {
       list: 'boxes.list',
+      getByScannedValue: 'boxes.getByScannedValue',
     },
     items: {
       create: 'items.create',
@@ -49,7 +50,7 @@ const mockedUseMutation = vi.mocked(useMutation) as unknown as {
   mockImplementation: (implementation: (mutation: unknown) => unknown) => void
 }
 const mockedUseQuery = vi.mocked(useQuery) as unknown as {
-  mockImplementation: (implementation: (query: unknown) => unknown) => void
+  mockImplementation: (implementation: (query: unknown, args?: unknown) => unknown) => void
 }
 
 describe('CreateItemPage', () => {
@@ -69,8 +70,11 @@ describe('CreateItemPage', () => {
           .mockResolvedValueOnce({ storageId: 'additional-photo-id' }),
       }),
     )
-    mockedUseQuery.mockImplementation((query) => {
+    mockedUseQuery.mockImplementation((query, args) => {
       if (query === api.boxes.list) return [{ _id: 'box-id', name: 'Garage bin', identifier: 'BOX-001' }]
+      if (query === api.boxes.getByScannedValue) {
+        return args === 'skip' ? undefined : { _id: 'box-id', name: 'Garage bin', identifier: 'BOX-001' }
+      }
       return undefined
     })
     mockedUseMutation.mockImplementation((mutation) => {
@@ -119,7 +123,7 @@ describe('CreateItemPage', () => {
     )
 
     await user.selectOptions(screen.getByRole('combobox', { name: /box/i }), 'box-id')
-    await user.upload(screen.getByLabelText(/photos/i), [
+    await user.upload(screen.getByLabelText(/upload photo/i), [
       new File(['main'], 'main.png', { type: 'image/png' }),
       new File(['extra'], 'extra.png', { type: 'image/png' }),
     ])
@@ -139,6 +143,19 @@ describe('CreateItemPage', () => {
     expect(fetch).toHaveBeenCalledTimes(2)
   })
 
+  it('shows separate photo actions for camera capture and upload', () => {
+    render(
+      <MemoryRouter>
+        <CreateItemPage />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('button', { name: /take photo/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /upload photo/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/take photo/i)).toHaveAttribute('capture', 'environment')
+    expect(screen.getByLabelText(/upload photo/i)).not.toHaveAttribute('capture')
+  })
+
   it('removes pending photos before upload', async () => {
     const user = userEvent.setup()
 
@@ -149,7 +166,7 @@ describe('CreateItemPage', () => {
     )
 
     await user.selectOptions(screen.getByRole('combobox', { name: /box/i }), 'box-id')
-    await user.upload(screen.getByLabelText(/photos/i), [
+    await user.upload(screen.getByLabelText(/upload photo/i), [
       new File(['main'], 'main.png', { type: 'image/png' }),
       new File(['extra'], 'extra.png', { type: 'image/png' }),
     ])
@@ -171,6 +188,37 @@ describe('CreateItemPage', () => {
 
   it('selects a box by scanning its identifier', async () => {
     const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <CreateItemPage />
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('button', { name: /scan box identifier/i }))
+    await user.click(screen.getByRole('button', { name: /scanner/i }))
+    await user.type(screen.getByLabelText(/name/i), 'Label maker')
+    await user.click(screen.getByRole('button', { name: /save item/i }))
+
+    await waitFor(() => {
+      expect(createItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          boxId: 'box-id',
+          title: 'Label maker',
+        }),
+      )
+    })
+  })
+
+  it('selects a box by scanning its name', async () => {
+    const user = userEvent.setup()
+    mockedUseQuery.mockImplementation((query, args) => {
+      if (query === api.boxes.list) return [{ _id: 'box-id', name: 'Garage bin', identifier: 'BOX-001' }]
+      if (query === api.boxes.getByScannedValue) {
+        return args === 'skip' ? undefined : { _id: 'box-id', name: 'Garage bin', identifier: 'BOX-001' }
+      }
+      return undefined
+    })
 
     render(
       <MemoryRouter>

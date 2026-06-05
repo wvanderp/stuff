@@ -27,6 +27,11 @@ const formatFileSize = (size: number) => {
 export default function CreateItemPage() {
   const navigate = useNavigate()
   const boxes = useQuery(api.boxes.list)
+  const [scannedBoxCode, setScannedBoxCode] = useState<string | null>(null)
+  const scannedBox = useQuery(
+    api.boxes.getByScannedValue,
+    scannedBoxCode ? { code: scannedBoxCode } : 'skip',
+  )
   const createItem = useMutation(api.items.create)
   const generateUploadUrl = useMutation(api.files.generateUploadUrl)
   const [title, setTitle] = useState('')
@@ -40,8 +45,13 @@ export default function CreateItemPage() {
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const nextPhotoId = useRef(1)
+  const takePhotoInputRef = useRef<HTMLInputElement>(null)
+  const uploadPhotoInputRef = useRef<HTMLInputElement>(null)
 
-  const canSave = Boolean(boxId && (title.trim() || photos.length > 0))
+  const selectedBoxId = scannedBox?._id ?? boxId
+  const scannedBoxError = scannedBoxCode && scannedBox === null ? `No box found for ${scannedBoxCode}` : null
+  const visibleError = error ?? scannedBoxError
+  const canSave = Boolean(selectedBoxId && (title.trim() || photos.length > 0))
 
   const uploadPhotos = async () => {
     const storageIds: string[] = []
@@ -80,7 +90,7 @@ export default function CreateItemPage() {
         description: description.trim(),
         keywords: parseList(keywords),
         photoStorageIds,
-        boxId: boxId as Id<'boxes'>,
+        boxId: selectedBoxId as Id<'boxes'>,
         identifiers: parseList(identifiers),
       })
       navigate(`/items/${itemId}`)
@@ -99,14 +109,8 @@ export default function CreateItemPage() {
   }
 
   const selectBoxByIdentifier = (code: string) => {
-    const matchingBox = boxes?.find((box) => box.identifier === code)
-    if (!matchingBox) {
-      setError(`No box found for identifier ${code}`)
-      return
-    }
-
     setError(null)
-    setBoxId(matchingBox._id)
+    setScannedBoxCode(code)
   }
 
   const openScanner = (target: 'box' | 'itemIdentifier') => {
@@ -148,14 +152,17 @@ export default function CreateItemPage() {
       <h1 className="text-3xl font-bold mb-6">Add Item</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {error && <div className="bg-red-950 text-red-200 border border-red-800 rounded-lg p-3">{error}</div>}
+        {visibleError && <div className="bg-red-950 text-red-200 border border-red-800 rounded-lg p-3">{visibleError}</div>}
 
         <label className="block">
           <span className="text-sm font-semibold text-gray-400">Box</span>
           <div className="mt-2 flex gap-2">
             <select
-              value={boxId}
-              onChange={(event) => setBoxId(event.target.value)}
+              value={selectedBoxId}
+              onChange={(event) => {
+                setScannedBoxCode(null)
+                setBoxId(event.target.value)
+              }}
               required
               className="min-w-0 flex-1 px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
@@ -194,9 +201,38 @@ export default function CreateItemPage() {
           />
         </label>
 
-        <label className="block">
+        <div className="block">
           <span className="text-sm font-semibold text-gray-400">Photos</span>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => takePhotoInputRef.current?.click()}
+              className="rounded-lg bg-gray-800 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-700"
+            >
+              Take Photo
+            </button>
+            <button
+              type="button"
+              onClick={() => uploadPhotoInputRef.current?.click()}
+              className="rounded-lg bg-gray-800 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-700"
+            >
+              Upload Photo
+            </button>
+          </div>
           <input
+            ref={takePhotoInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={(event) => {
+              addPhotos(event.target.files)
+              event.target.value = ''
+            }}
+            className="sr-only"
+            aria-label="Take photo"
+          />
+          <input
+            ref={uploadPhotoInputRef}
             type="file"
             accept="image/*"
             multiple
@@ -204,7 +240,8 @@ export default function CreateItemPage() {
               addPhotos(event.target.files)
               event.target.value = ''
             }}
-            className="mt-2 w-full text-sm text-gray-300 file:mr-4 file:rounded-lg file:border-0 file:bg-gray-800 file:px-4 file:py-3 file:text-white"
+            className="sr-only"
+            aria-label="Upload photo"
           />
           {photos.length > 0 && (
             <div className="mt-3 space-y-2">
@@ -236,7 +273,7 @@ export default function CreateItemPage() {
               </ul>
             </div>
           )}
-        </label>
+        </div>
 
         <label className="block">
           <span className="text-sm font-semibold text-gray-400">Description</span>

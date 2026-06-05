@@ -63,6 +63,41 @@ export const getByIdentifier = query({
   },
 });
 
+// Query: Resolve scanned box text by document ID, identifier, or name
+export const getByScannedValue = query({
+  args: { code: v.string() },
+  handler: async (ctx, args) => {
+    const code = args.code.trim();
+    if (!code) {
+      return null;
+    }
+
+    const normalizedId = ctx.db.normalizeId("boxes", code);
+    if (normalizedId !== null) {
+      const boxById = await ctx.db.get(normalizedId);
+      if (boxById !== null) {
+        return await withPhotoUrl(ctx, boxById);
+      }
+    }
+
+    const boxByIdentifier = await ctx.db
+      .query("boxes")
+      .withIndex("by_identifier", (q) => q.eq("identifier", code))
+      .first();
+
+    if (boxByIdentifier !== null) {
+      return await withPhotoUrl(ctx, boxByIdentifier);
+    }
+
+    const boxByName = await ctx.db
+      .query("boxes")
+      .withIndex("by_name", (q) => q.eq("name", code))
+      .first();
+
+    return boxByName === null ? null : await withPhotoUrl(ctx, boxByName);
+  },
+});
+
 // Query: Get all items in a box
 export const getItems = query({
   args: { boxId: v.id("boxes") },

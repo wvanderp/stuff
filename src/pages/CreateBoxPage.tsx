@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useMutation } from 'convex/react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
@@ -15,6 +15,8 @@ export default function CreateBoxPage() {
   const [showScanner, setShowScanner] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const takePhotoInputRef = useRef<HTMLInputElement>(null)
+  const uploadPhotoInputRef = useRef<HTMLInputElement>(null)
 
   const uploadPhoto = async () => {
     if (!photo) return null
@@ -120,16 +122,42 @@ export default function CreateBoxPage() {
           />
         </label>
 
-        <label className="block">
+        <div className="block">
           <span className="text-sm font-semibold text-gray-400">Photo</span>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => takePhotoInputRef.current?.click()}
+              className="rounded-lg bg-gray-800 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-700"
+            >
+              Take Photo
+            </button>
+            <button
+              type="button"
+              onClick={() => uploadPhotoInputRef.current?.click()}
+              className="rounded-lg bg-gray-800 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-700"
+            >
+              Upload Photo
+            </button>
+          </div>
           <input
+            ref={takePhotoInputRef}
             type="file"
             accept="image/*"
             capture="environment"
             onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
-            className="mt-2 w-full text-sm text-gray-300 file:mr-4 file:rounded-lg file:border-0 file:bg-gray-800 file:px-4 file:py-3 file:text-white"
+            className="sr-only"
+            aria-label="Take photo"
           />
-        </label>
+          <input
+            ref={uploadPhotoInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
+            className="sr-only"
+            aria-label="Upload photo"
+          />
+        </div>
 
         <button
           type="submit"

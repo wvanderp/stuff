@@ -24,7 +24,9 @@ export default defineSchema({
     description: v.string(),
     photoStorageId: v.union(v.string(), v.null()),
     identifier: v.string(),
-  }).index("by_identifier", ["identifier"]),
+  })
+    .index("by_identifier", ["identifier"])
+    .index("by_name", ["name"]),
 
   notes: defineTable({
     itemId: v.id("items"),

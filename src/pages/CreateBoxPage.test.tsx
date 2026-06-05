@@ -78,4 +78,17 @@ describe('CreateBoxPage', () => {
     })
     expect(navigate).toHaveBeenCalledWith('/boxes/box-id')
   })
+
+  it('shows separate photo actions for camera capture and upload', () => {
+    render(
+      <MemoryRouter>
+        <CreateBoxPage />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('button', { name: /take photo/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /upload photo/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/take photo/i)).toHaveAttribute('capture', 'environment')
+    expect(screen.getByLabelText(/upload photo/i)).not.toHaveAttribute('capture')
+  })
 })

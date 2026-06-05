@@ -25,8 +25,8 @@ export default function Scanner({ onClose, onScan }: ScannerProps) {
   )
   
   const box = useQuery(
-    api.boxes.getByIdentifier,
-    scannedCode ? { identifier: scannedCode } : 'skip'
+    api.boxes.getByScannedValue,
+    scannedCode ? { code: scannedCode } : 'skip'
   )
 
   useEffect(() => {

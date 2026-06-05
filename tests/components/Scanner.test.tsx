@@ -42,7 +42,7 @@ vi.mock('../../convex/_generated/api', () => ({
       getByIdentifier: 'items.getByIdentifier',
     },
     boxes: {
-      getByIdentifier: 'boxes.getByIdentifier',
+      getByScannedValue: 'boxes.getByScannedValue',
     },
   },
 }))
