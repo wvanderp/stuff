@@ -67,8 +67,8 @@ export default function IdentifierList({ itemId, identifiers }: IdentifierListPr
         <div className="text-gray-500 text-sm">No identifiers</div>
       ) : (
         <div className="space-y-1">
-          {identifiers.map((identifier) => (
-            <div key={identifier} className="bg-gray-900 px-3 py-2 rounded text-sm font-mono">
+          {identifiers.map((identifier, index) => (
+            <div key={`${identifier}-${index}`} className="bg-gray-900 px-3 py-2 rounded text-sm font-mono">
               {identifier}
             </div>
           ))}

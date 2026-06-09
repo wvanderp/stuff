@@ -91,18 +91,6 @@ export const create = mutation({
     if (!title && args.photoStorageIds.length === 0) {
       throw new Error("Item requires a name or at least one photo");
     }
-
-    // Check for duplicate identifiers
-    if (args.identifiers.length > 0) {
-      const allItems = await ctx.db.query("items").collect();
-      for (const item of allItems) {
-        for (const identifier of args.identifiers) {
-          if (item.identifiers.includes(identifier)) {
-            throw new Error(`Item with identifier ${identifier} already exists`);
-          }
-        }
-      }
-    }
     
     const heroPhotoStorageId = args.photoStorageIds.length > 0 
       ? args.photoStorageIds[0] 
@@ -180,14 +168,6 @@ export const addIdentifier = mutation({
     identifier: v.string(),
   },
   handler: async (ctx, args) => {
-    // Check for duplicates across all items
-    const allItems = await ctx.db.query("items").collect();
-    for (const item of allItems) {
-      if (item.identifiers.includes(args.identifier)) {
-        throw new Error(`Item with identifier ${args.identifier} already exists`);
-      }
-    }
-    
     const item = await ctx.db.get(args.id);
     if (!item) throw new Error("Item not found");
     

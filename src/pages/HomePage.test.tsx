@@ -78,4 +78,20 @@ describe('HomePage', () => {
 
     expect(authMocks.logout).toHaveBeenCalledOnce()
   })
+
+  it('shows Bulk mode inside the account menu', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByRole('link', { name: /bulk mode/i })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /open account menu/i }))
+
+    expect(screen.getByRole('link', { name: /bulk mode/i })).toHaveAttribute('href', '/items/bulk')
+  })
 })

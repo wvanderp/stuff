@@ -79,6 +79,13 @@ export default function HomePage() {
             </button>
             {showMenu && (
               <div className="absolute right-0 z-20 mt-2 w-40 rounded-lg border border-gray-700 bg-gray-900 p-1 shadow-xl shadow-black/30">
+                <Link
+                  to="/items/bulk"
+                  onClick={() => setShowMenu(false)}
+                  className="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-gray-100 hover:bg-gray-800"
+                >
+                  Bulk mode
+                </Link>
                 <button
                   type="button"
                   onClick={async () => {
